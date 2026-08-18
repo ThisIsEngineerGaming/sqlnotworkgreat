@@ -1,0 +1,122 @@
+html {
+    font-size: clamp(14px, 0.92rem + 0.4vw, 16px);
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: clamp(15px, 0.98rem + 0.35vw, 17px);
+    }
+}
+
+body {
+    margin-bottom: 60px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f9f9f9;
+    color: #1a1a1a;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+footer {
+    margin-top: auto;
+}
+
+.students-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    margin-top: 0.5rem;
+}
+
+    .students-table thead th {
+        background: none;
+        color: #6b7280;
+        font-weight: 500;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0 1rem 1rem;
+        text-align: left;
+        border-bottom: 1.5px solid #e2e8f0;
+    }
+
+    .students-table tbody tr {
+        background: #ffffff;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+        border-radius: 12px;
+        transition: background 0.22s ease, box-shadow 0.22s ease;
+    }
+
+        .students-table tbody tr:hover {
+            background: #f8faff;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+        }
+
+    .students-table td {
+        padding: 1.1rem 1rem;
+        border: none;
+        font-size: 0.95rem;
+    }
+
+        .students-table td:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        .students-table td:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+    .students-table .name {
+        font-weight: 500;
+        color: #111827;
+    }
+
+    .students-table .surname {
+        font-weight: 600;
+        color: #111827;
+        font-size: 1rem;
+    }
+
+    .students-table .age {
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .students-table .gpa {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 58px;
+        height: 36px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(16,185,129,0.22);
+    }
+
+.container h2 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.8rem;
+}
+
+.alert-info {
+    background: #f8faff;
+    color: #1e40af;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    padding: 1.3rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+}

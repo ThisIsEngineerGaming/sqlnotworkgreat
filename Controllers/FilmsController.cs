@@ -3,22 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mvc;
 
-public class StudentsController : Controller
+public class FilmsController : Controller
 {
-    private readonly StudentContext _context;
+    private readonly FilmContext _context;
 
-    public StudentsController(StudentContext context)
+    public FilmsController(FilmContext context)
     {
         _context = context;
     }
 
-    // GET: STUDENTS
+    // GET: FILMS
     public async Task<IActionResult> Index()    
     {
-        return View(await _context.Students.ToListAsync());
+        return View(await _context.Films.ToListAsync());
     }
 
-    // GET: STUDENTS/Details/5
+    // GET: FILMS/Details/5
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
@@ -26,39 +26,39 @@ public class StudentsController : Controller
             return NotFound();
         }
 
-        var student = await _context.Students
+        var film = await _context.Films
             .FirstOrDefaultAsync(m => m.Id == id);
-        if (student == null)
+        if (film == null)
         {
             return NotFound();
         }
 
-        return View(student);
+        return View(film);
     }
 
-    // GET: STUDENTS/Create
+    // GET: FILMS/Create
     public IActionResult Create()
     {
         return View();
     }
 
-    // POST: STUDENTS/Create
+    // POST: FILMS/Create
     // To protect from overposting attacks, enable the specific properties you want to bind to.
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Name,Surname,Age,GPA")] Student student)
+    public async Task<IActionResult> Create([Bind("Id,Title,Director,ReleaseYear,Genre,Rating,PhotoUrl")] Film film)
     {
         if (ModelState.IsValid)
         {
-            _context.Add(student);
+            _context.Add(film);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        return View(student);
+        return View(film);
     }
 
-    // GET: STUDENTS/Edit/5
+    // GET: FILMS/Edit/5
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -66,22 +66,22 @@ public class StudentsController : Controller
             return NotFound();
         }
 
-        var student = await _context.Students.FindAsync(id);
-        if (student == null)
+        var film = await _context.Films.FindAsync(id);
+        if (film == null)
         {
             return NotFound();
         }
-        return View(student);
+        return View(film);
     }
 
-    // POST: STUDENTS/Edit/5
+    // POST: FILMS/Edit/5
     // To protect from overposting attacks, enable the specific properties you want to bind to.
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("Id,Name,Surname,Age,GPA")] Student student)
+    public async Task<IActionResult> Edit(int? id, [Bind("Id,Title,Director,ReleaseYear,Genre,Rating,PhotoUrl")] Film film)
     {
-        if (id != student.Id)
+        if (id != film.Id)
         {
             return NotFound();
         }
@@ -90,12 +90,12 @@ public class StudentsController : Controller
         {
             try
             {
-                _context.Update(student);
+                _context.Update(film);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!StudentExists(student.Id))
+                if (!FilmExists(film.Id))
                 {
                     return NotFound();
                 }
@@ -106,10 +106,10 @@ public class StudentsController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
-        return View(student);
+        return View(film);
     }
 
-    // GET: STUDENTS/Delete/5
+    // GET: FILMS/Delete/5
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -117,33 +117,33 @@ public class StudentsController : Controller
             return NotFound();
         }
 
-        var student = await _context.Students
+        var film = await _context.Films
             .FirstOrDefaultAsync(m => m.Id == id);
-        if (student == null)
+        if (film == null)
         {
             return NotFound();
         }
 
-        return View(student);
+        return View(film);
     }
 
-    // POST: STUDENTS/Delete/5
+    // POST: FILMS/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
-        var student = await _context.Students.FindAsync(id);
-        if (student != null)
+        var film = await _context.Films.FindAsync(id);
+        if (film != null)
         {
-            _context.Students.Remove(student);
+            _context.Films.Remove(film);
         }
 
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
 
-    private bool StudentExists(int? id)
+    private bool FilmExists(int? id)
     {
-        return _context.Students.Any(e => e.Id == id);
+        return _context.Films.Any(e => e.Id == id);
     }
 }

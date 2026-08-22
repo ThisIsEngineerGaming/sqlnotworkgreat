@@ -1,53 +1,21 @@
-﻿<!DOCTYPE html> <!-- т.зв. майстер-сторінка, зручно для схожого дизайну різних сторінок сайта -->
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASP.NET MVC Application</title>
-    <!-- теги лінк та скріпт нижче - це не звичайні теги, а т.зв. тег-хелпери,
-            вони допомагають правильно вказати шляхи до файлів стилів та скриптів, часто містять незвичні для хтмл атрибути
-            конкретно ~ у шляху вказує на папку wwwroot, використовується так звана віртуальна адресація, без ~ шлях буде відносним до поточної сторінки, і тег стане звичайним хтмл тегом 
-          
-         основна причина використання - швидкі оновлення на продакшені.
-         якщо написати <link href="~/css/site.css" /> вручну, то ми потім самі відповідаємо за те, щоб після кожного деплою користувачі отримали новий файл.
-    99 % розробників цього не роблять, і внаслідок користувачі бачать старі стилі тижнями.
-    але якщо скористатись тег-хелперами і скажімо додати asp-append-version="true", то ASP.NET Core зробить всі оновлення за нас автоматично і безпомилково.
-            -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <!-- cтворення посилань в меню за допомогою HTML-хелпера ActionLink -->
-                @Html.ActionLink("Площа", // текст посилання в меню
-                "Square", // назва дії (методу контролера)
-                "Home", // назва контролера
-                new { a = 10, h = 10 }, // параметри дії
-                new { @class = "navbar-brand" } // CSS клас для стилізації посилання, собака перед class потрібна, щоб не плуталося з ключовим словом class в C#
-                ) 
-
-                @Html.ActionLink("HTML", "GetHtml", "Home", null, new { @class = "navbar-brand" })
-                @Html.ActionLink("Файл", "GetFile", "Home", null, new { @class = "navbar-brand" })
-                @Html.ActionLink("Щось", "SomeMethod", "Home", null, new { @class = "navbar-brand" })
-                @Html.ActionLink("Home-Index", "Index", "Home", null, new { @class = "navbar-brand" })
-                @Html.ActionLink("Редірект", "RedirectMethod", "Home", null, new { @class = "navbar-brand" })
-                @Html.ActionLink("Список студентів", "Index", "Student", null, new { @class = "navbar-brand" })
-                <!-- !!! подивитися код, який згенериться на сторінці хтмл в браузері !!!
-                значення в href - не просто посилання, а маршрут, який буде оброблений маршрутизатором ASP.NET Core MVC за допомогою відповідного контролера -->
-            </div>
-        </div>
-    </div>
-
     <div class="container body-content">
-        @RenderBody() <!-- саме тут буде виведено вміст тої чи іншої конкретної сторінки !!! -->
+        @RenderBody()
         <hr />
         <footer>
             <p>&copy; by Sunmeat. All rights and lefts reserved. @DateTime.Now - ASP.NET Core MVC is mogmaxxing while others copeskipping</p>
         </footer>
-    </div> <!-- питання: а як ми сюди потрапили? відповідь: дивимось _ViewStart.cshtml -->
+    </div>
 
     <script src="~/lib/jquery/dist/jquery.js"></script>
     @await RenderSectionAsync("Scripts", required: false)

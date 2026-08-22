@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mvc;
@@ -6,10 +5,12 @@ using mvc;
 public class FilmsController : Controller
 {
     private readonly FilmContext _context;
+    private readonly IWebHostEnvironment _hostEnvironment;
 
-    public FilmsController(FilmContext context)
+    public FilmsController(FilmContext context, IWebHostEnvironment hostEnvironment)
     {
         _context = context;
+        _hostEnvironment = hostEnvironment;
     }
 
     // GET: FILMS
@@ -43,14 +44,40 @@ public class FilmsController : Controller
     }
 
     // POST: FILMS/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Title,Director,ReleaseYear,Genre,Rating,PhotoUrl")] Film film)
+    public async Task<IActionResult> Create([Bind("Id,Title,Director,ReleaseYear,Genre,Rating,PhotoUrl")] Film film, IFormFile PhotoFile)
     {
         if (ModelState.IsValid)
         {
+            // Handle file upload if provided
+            if (PhotoFile != null && PhotoFile.Length > 0)
+            {
+                try
+                {
+                    string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "films");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    string fileName = $"{Guid.NewGuid()}_{Path.GetFileName(PhotoFile.FileName)}";
+                    string filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await PhotoFile.CopyToAsync(fileStream);
+                    }
+
+                    film.PhotoUrl = $"/images/films/{fileName}";
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("PhotoFile", "Error uploading file: " + ex.Message);
+                    return View(film);
+                }
+            }
+
             _context.Add(film);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -75,11 +102,9 @@ public class FilmsController : Controller
     }
 
     // POST: FILMS/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("Id,Title,Director,ReleaseYear,Genre,Rating,PhotoUrl")] Film film)
+    public async Task<IActionResult> Edit(int? id, [Bind("Id,Title,Director,ReleaseYear,Genre,Rating,PhotoUrl")] Film film, IFormFile PhotoFile)
     {
         if (id != film.Id)
         {
@@ -90,6 +115,34 @@ public class FilmsController : Controller
         {
             try
             {
+                // Handle file upload if provided
+                if (PhotoFile != null && PhotoFile.Length > 0)
+                {
+                    try
+                    {
+                        string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "films");
+                        if (!Directory.Exists(uploadsFolder))
+                        {
+                            Directory.CreateDirectory(uploadsFolder);
+                        }
+
+                        string fileName = $"{Guid.NewGuid()}_{Path.GetFileName(PhotoFile.FileName)}";
+                        string filePath = Path.Combine(uploadsFolder, fileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await PhotoFile.CopyToAsync(fileStream);
+                        }
+
+                        film.PhotoUrl = $"/images/films/{fileName}";
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("PhotoFile", "Error uploading file: " + ex.Message);
+                        return View(film);
+                    }
+                }
+
                 _context.Update(film);
                 await _context.SaveChangesAsync();
             }

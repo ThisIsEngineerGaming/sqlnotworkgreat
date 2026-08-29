@@ -120,3 +120,139 @@ footer {
     font-size: 0.95rem;
     font-weight: 500;
 }
+
+/* ===================== Валідація форм ===================== */
+
+.form-group {
+    margin-bottom: 1.1rem;
+}
+
+.form-group .control-label {
+    display: inline-block;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.form-control {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+/* Повідомлення про помилку під конкретним полем (Validation Message Tag Helper) */
+.text-danger,
+.field-validation-error {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #dc2626;
+    font-size: 0.83rem;
+    font-weight: 500;
+    margin-top: 0.4rem;
+    animation: validation-fade-in 0.25s ease-out;
+}
+
+.field-validation-error:empty,
+.text-danger:empty {
+    margin-top: 0;
+    animation: none;
+}
+
+.field-validation-error::before {
+    content: "\26A0\FE0F";
+    font-size: 0.9rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* Загальний блок помилок форми (Validation Summary Tag Helper) */
+.validation-summary-errors {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 4px solid #dc2626;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    animation: validation-fade-in 0.3s ease-out;
+}
+
+    .validation-summary-errors::before {
+        content: "\26A0\FE0F  Please fix the following errors:";
+        display: block;
+        color: #991b1b;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .validation-summary-errors ul {
+        margin: 0;
+        padding-left: 0;
+        list-style: none;
+    }
+
+    .validation-summary-errors li {
+        position: relative;
+        color: #b91c1c;
+        font-weight: 500;
+        font-size: 0.88rem;
+        padding-left: 1.5rem;
+        margin-bottom: 0.3rem;
+    }
+
+        .validation-summary-errors li::before {
+            content: "\2022";
+            position: absolute;
+            left: 0.35rem;
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+.validation-summary-valid {
+    display: none;
+}
+
+.input-validation-error {
+    border: 1.5px solid #dc2626 !important;
+    background-color: #fef2f2;
+    animation: validation-shake 0.35s ease;
+}
+
+    .input-validation-error:focus {
+        outline: none;
+        border-color: #dc2626;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18);
+    }
+
+@keyframes validation-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes validation-shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-4px);
+    }
+
+    40% {
+        transform: translateX(4px);
+    }
+
+    60% {
+        transform: translateX(-3px);
+    }
+
+    80% {
+        transform: translateX(3px);
+    }
+}

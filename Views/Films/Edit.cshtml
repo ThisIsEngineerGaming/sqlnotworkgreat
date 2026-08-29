@@ -8,7 +8,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit" enctype="multipart/form-data">
+        <form asp-action="Edit" enctype="multipart/form-data" novalidate>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -49,8 +49,9 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">Photo URL</label>
+                <label asp-for="PhotoUrl" class="control-label"></label>
                 <input asp-for="PhotoUrl" class="form-control" placeholder="Enter image URL (e.g., https://example.com/poster.jpg)" />
+                <span asp-validation-for="PhotoUrl" class="text-danger"></span>
                 <small class="form-text text-muted">Change photo URL OR upload a file below to replace</small>
             </div>
 
@@ -58,7 +59,7 @@
                 <label class="control-label">Upload New Photo File</label>
                 <input type="file" name="PhotoFile" class="form-control" accept="image/*" />
                 <small class="form-text text-muted">Upload a local image file (JPG, PNG, etc.) to replace current photo</small>
-                <span class="text-danger" id="photoFileError"></span>
+                <span class="field-validation-error" id="photoFileError"></span>
             </div>
 
             <div class="form-group">
@@ -72,22 +73,21 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-<script>
-    // Optional: validate file size before upload
-    document.querySelector('input[name="PhotoFile"]').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        const errorEl = document.getElementById('photoFileError');
-        
-        if (file && file.size > maxSize) {
-            errorEl.textContent = 'File size must be less than 5MB';
-            e.target.value = '';
-        } else {
-            errorEl.textContent = '';
-        }
-    });
-</script>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Optional: validate file size before upload
+        document.querySelector('input[name="PhotoFile"]').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            const errorEl = document.getElementById('photoFileError');
+
+            if (file && file.size > maxSize) {
+                errorEl.textContent = 'File size must be less than 5MB';
+                e.target.value = '';
+            } else {
+                errorEl.textContent = '';
+            }
+        });
+    </script>
 }

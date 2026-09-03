@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using mvc.Extensions;
 // dotnet add package Microsoft.EntityFrameworkCore !!! встановлюємо пакети, інакше код не працюватиме, View > Terminal
 // dotnet add package Microsoft.EntityFrameworkCore.SqlServer !!!
 
@@ -23,6 +24,11 @@ namespace mvc
 
             // додаємо сервіси MVC, інакше не працюватимуть контролери і не підтягнуться вью
             builder.Services.AddControllersWithViews();
+
+            // реєструємо власний сервісний шар (IFilmService -> FilmService) через extension-метод,
+            // винесений в Extensions/ServiceCollectionExtensions.cs — саме сюди тепер звертатиметься
+            // FilmsController через Dependency Injection, а не напряму до FilmContext
+            builder.Services.AddApplicationServices();
 
             var app = builder.Build();
 

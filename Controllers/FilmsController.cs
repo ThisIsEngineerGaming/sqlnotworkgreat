@@ -1,34 +1,31 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using mvc;
+using mvc.Services;
 
+// Контролер тепер "тонкий" (thin controller): жодної роботи з FilmContext
+// чи файловою системою тут більше немає. Уся бізнес-логіка та доступ
+// до даних винесені в сервісний шар (Services/IFilmService, Services/FilmService).
+// Контролер лише отримує IFilmService через Dependency Injection
+// і викликає його методи, а сам відповідає тільки за HTTP/View-частину.
 public class FilmsController : Controller
 {
-    private readonly FilmContext _context;
-    private readonly IWebHostEnvironment _hostEnvironment;
+    private readonly IFilmService _filmService;
 
-    public FilmsController(FilmContext context, IWebHostEnvironment hostEnvironment)
+    public FilmsController(IFilmService filmService)
     {
-        _context = context;
-        _hostEnvironment = hostEnvironment;
+        _filmService = filmService;
     }
 
     // GET: FILMS
-    public async Task<IActionResult> Index()    
+    public async Task<IActionResult> Index()
     {
-        return View(await _context.Films.ToListAsync());
+        return View(await _filmService.GetAllFilmsAsync());
     }
 
     // GET: FILMS/Details/5
     public async Task<IActionResult> Details(int? id)
     {
-        if (id == null)
-        {
-            return NotFound();
-        }
-
-        var film = await _context.Films
-            .FirstOrDefaultAsync(m => m.Id == id);
+        var film = await _filmService.GetFilmByIdAsync(id);
         if (film == null)
         {
             return NotFound();
@@ -48,56 +45,33 @@ public class FilmsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Id,Title,Director,ReleaseYear,Genre,Rating,PhotoUrl")] Film film, IFormFile PhotoFile)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            // Handle file upload if provided
-            if (PhotoFile != null && PhotoFile.Length > 0)
-            {
-                try
-                {
-                    string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "films");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
-
-                    string fileName = $"{Guid.NewGuid()}_{Path.GetFileName(PhotoFile.FileName)}";
-                    string filePath = Path.Combine(uploadsFolder, fileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await PhotoFile.CopyToAsync(fileStream);
-                    }
-
-                    film.PhotoUrl = $"/images/films/{fileName}";
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("PhotoFile", "Error uploading file: " + ex.Message);
-                    return View(film);
-                }
-            }
-
-            _context.Add(film);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return View(film);
         }
-        return View(film);
+
+        try
+        {
+            await _filmService.CreateFilmAsync(film, PhotoFile);
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("PhotoFile", "Error uploading file: " + ex.Message);
+            return View(film);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: FILMS/Edit/5
     public async Task<IActionResult> Edit(int? id)
     {
-        if (id == null)
-        {
-            return NotFound();
-        }
-
-        var film = await _context.Films.FindAsync(id);
+        var film = await _filmService.GetFilmByIdAsync(id);
         if (film == null)
         {
             return NotFound();
         }
+
         return View(film);
     }
 
@@ -111,67 +85,32 @@ public class FilmsController : Controller
             return NotFound();
         }
 
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            try
-            {
-                // Handle file upload if provided
-                if (PhotoFile != null && PhotoFile.Length > 0)
-                {
-                    try
-                    {
-                        string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "films");
-                        if (!Directory.Exists(uploadsFolder))
-                        {
-                            Directory.CreateDirectory(uploadsFolder);
-                        }
-
-                        string fileName = $"{Guid.NewGuid()}_{Path.GetFileName(PhotoFile.FileName)}";
-                        string filePath = Path.Combine(uploadsFolder, fileName);
-
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await PhotoFile.CopyToAsync(fileStream);
-                        }
-
-                        film.PhotoUrl = $"/images/films/{fileName}";
-                    }
-                    catch (Exception ex)
-                    {
-                        ModelState.AddModelError("PhotoFile", "Error uploading file: " + ex.Message);
-                        return View(film);
-                    }
-                }
-
-                _context.Update(film);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FilmExists(film.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction(nameof(Index));
+            return View(film);
         }
-        return View(film);
+
+        try
+        {
+            bool updated = await _filmService.UpdateFilmAsync(id.Value, film, PhotoFile);
+            if (!updated)
+            {
+                return NotFound();
+            }
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("PhotoFile", "Error uploading file: " + ex.Message);
+            return View(film);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: FILMS/Delete/5
     public async Task<IActionResult> Delete(int? id)
     {
-        if (id == null)
-        {
-            return NotFound();
-        }
-
-        var film = await _context.Films
-            .FirstOrDefaultAsync(m => m.Id == id);
+        var film = await _filmService.GetFilmByIdAsync(id);
         if (film == null)
         {
             return NotFound();
@@ -185,18 +124,7 @@ public class FilmsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
-        var film = await _context.Films.FindAsync(id);
-        if (film != null)
-        {
-            _context.Films.Remove(film);
-        }
-
-        await _context.SaveChangesAsync();
+        await _filmService.DeleteFilmAsync(id);
         return RedirectToAction(nameof(Index));
-    }
-
-    private bool FilmExists(int? id)
-    {
-        return _context.Films.Any(e => e.Id == id);
     }
 }

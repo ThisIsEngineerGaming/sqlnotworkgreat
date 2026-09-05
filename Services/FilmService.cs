@@ -1,29 +1,34 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using mvc;
+using mvc.Repositories;
 
 namespace mvc.Services
 {
     // Реалізація сервісу фільмів.
-    // Сюди перенесено всю бізнес-логіку та роботу з файлами/БД,
-    // яка раніше "жила" прямо в FilmsController.
-    // Сервіс отримує свої залежності (FilmContext, IWebHostEnvironment)
-    // через конструктор — так само за допомогою Dependency Injection,
-    // тільки тепер вони інкапсульовані тут, а не в контролері.
+    // Інтерфейс IFilmService залишився БЕЗ ЗМІН — контролер, як і раніше,
+    // працює лише з ним і навіть не підозрює, що всередині щось змінилося.
+    //
+    // А ось усередині сервіс тепер більше НЕ звертається до FilmContext
+    // напряму: замість цього він отримує через DI абстракцію IRepository<Film>
+    // і делегує їй усі операції з базою даних. Сам DbContext сервісу більше
+    // не потрібен і не інжектується.
+    // Це і є принцип інверсії залежностей (DIP): сервіс залежить від
+    // абстракції репозиторію, а не від конкретного класу доступу до БД.
     public class FilmService : IFilmService
     {
-        private readonly FilmContext _context;
+        private readonly IRepository<Film> _filmRepository;
         private readonly IWebHostEnvironment _hostEnvironment;
 
-        public FilmService(FilmContext context, IWebHostEnvironment hostEnvironment)
+        public FilmService(IRepository<Film> filmRepository, IWebHostEnvironment hostEnvironment)
         {
-            _context = context;
+            _filmRepository = filmRepository;
             _hostEnvironment = hostEnvironment;
         }
 
         public async Task<List<Film>> GetAllFilmsAsync()
         {
-            return await _context.Films.ToListAsync();
+            return await _filmRepository.GetAllAsync();
         }
 
         public async Task<Film?> GetFilmByIdAsync(int? id)
@@ -33,7 +38,7 @@ namespace mvc.Services
                 return null;
             }
 
-            return await _context.Films.FirstOrDefaultAsync(m => m.Id == id);
+            return await _filmRepository.GetByIdAsync(id.Value);
         }
 
         public async Task<Film> CreateFilmAsync(Film film, IFormFile? photoFile)
@@ -43,8 +48,8 @@ namespace mvc.Services
                 film.PhotoUrl = await SavePhotoFileAsync(photoFile);
             }
 
-            _context.Add(film);
-            await _context.SaveChangesAsync();
+            await _filmRepository.AddAsync(film);
+            await _filmRepository.SaveChangesAsync();
 
             return film;
         }
@@ -58,8 +63,8 @@ namespace mvc.Services
 
             try
             {
-                _context.Update(film);
-                await _context.SaveChangesAsync();
+                _filmRepository.Update(film);
+                await _filmRepository.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -76,22 +81,36 @@ namespace mvc.Services
 
         public async Task DeleteFilmAsync(int? id)
         {
-            var film = await _context.Films.FindAsync(id);
-            if (film != null)
+            if (id == null)
             {
-                _context.Films.Remove(film);
+                return;
             }
 
-            await _context.SaveChangesAsync();
+            await _filmRepository.DeleteAsync(id.Value);
+            await _filmRepository.SaveChangesAsync();
         }
 
         public bool FilmExists(int? id)
         {
-            return _context.Films.Any(e => e.Id == id);
+            // Сигнатура методу в IFilmService — синхронна (ми домовилися
+            // інтерфейс сервісу не змінювати), а всі операції з БД тепер
+            // "заховані" в асинхронному IRepository<T>. Тому тут доводиться
+            // синхронно дочекатися результату асинхронного виклику.
+            // Викликається лише в рідкісній гілці обробки конфлікту
+            // паралельного оновлення (DbUpdateConcurrencyException),
+            // тож блокування потоку тут не є проблемою на практиці.
+            if (id == null)
+            {
+                return false;
+            }
+
+            return _filmRepository.ExistsAsync(id.Value).GetAwaiter().GetResult();
         }
 
         // допоміжний приватний метод — інкапсулює роботу з файловою системою
-        // (збереження постера фільму в wwwroot/images/films)
+        // (збереження постера фільму в wwwroot/images/films).
+        // Це НЕ звернення до бази даних, тому доступ до файлової системи
+        // цілком коректно залишається в сервісі, а не в репозиторії.
         private async Task<string> SavePhotoFileAsync(IFormFile photoFile)
         {
             string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "films");

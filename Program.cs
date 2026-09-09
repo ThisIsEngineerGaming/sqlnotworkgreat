@@ -22,8 +22,12 @@ namespace mvc
             // до речі, в старому ASP.NET (не Core) такого не було, там треба було самому створювати об'єкти контексту даних, а тут все робиться автоматично (в Spring Boot для Java теж так само)
             // !!! два рядки коду вище будуть потрібні завжди, коли треба підключитися до бази даних через Entity Framework !!!
 
-            // додаємо сервіси MVC, інакше не працюватимуть контролери і не підтягнуться вью
-            builder.Services.AddControllersWithViews();
+            // додаємо сервіси Web API (без підтримки Views — вони тут більше не потрібні)
+            builder.Services.AddControllers();
+
+            // Swagger/OpenAPI — щоб мати зручний UI для тестування ендпоінтів API
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             // реєструємо власний сервісний шар (IFilmService -> FilmService) через extension-метод,
             // винесений в Extensions/ServiceCollectionExtensions.cs — саме сюди тепер звертатиметься
@@ -39,19 +43,21 @@ namespace mvc
                 db.EnsureDatabaseCreatedAndSeeded();
             }
 
-            // обслуговуємо статичні файли з wwwroot
+            // обслуговуємо статичні файли з wwwroot (постери фільмів лежать у wwwroot/images/films)
+            // UseDefaultFiles — при заході на корінь сайту віддає wwwroot/index.html (простий HTML/JS інтерфейс)
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
-            // стандартний маршрут, при заході на корінь сайту відкривається метод Index контролера Films
-            // при бажанні, можна буде вказати айді фільму в адресі, наприклад: /Films/Index/2
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Films}/{action=Index}/{id?}"); // тут Films - це назва саме контролера, а не моделі
-            // насправді, клас контролера називається FilmsController, але в маршруті вказується лише Films, цього достатньо тому що фреймворк сам додасть слово Controller, є таке правило
-            // можна легко замінити контролер на будь-який інший, наприклад Home, тоді відкриватиметься HomeController.cs
-            // роутів може бути багато, вони перевірятимуться зверху вниз
+            // Swagger UI доступний лише в Development, за замовчуванням на /swagger
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
-            // дивимось клас контролера FilmsController.cs та метод Index там
+            // маршрути тепер визначаються атрибутами прямо на контролері
+            // (див. [Route("api/[controller]")] та [HttpGet]/[HttpPost]/... у FilmsController.cs)
+            app.MapControllers();
 
             app.Run(); // запускаємо веб-додаток
         }

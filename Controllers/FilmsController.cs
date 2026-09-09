@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using mvc;
 using mvc.Services;
 
-// Контролер тепер "тонкий" (thin controller): жодної роботи з FilmContext
-// чи файловою системою тут більше немає. Уся бізнес-логіка та доступ
-// до даних винесені в сервісний шар (Services/IFilmService, Services/FilmService).
-// Контролер лише отримує IFilmService через Dependency Injection
-// і викликає його методи, а сам відповідає тільки за HTTP/View-частину.
-public class FilmsController : Controller
+// Контролер перероблено на Web API: більше не повертає Views,
+// а віддає дані у форматі JSON. Уся бізнес-логіка та доступ
+// до даних, як і раніше, винесені в сервісний шар (Services/IFilmService, Services/FilmService),
+// контролер лише відповідає за HTTP-частину (маршрути, статус-коди, серіалізація).
+[ApiController]
+[Route("api/[controller]")]
+public class FilmsController : ControllerBase
 {
     private readonly IFilmService _filmService;
 
@@ -16,14 +17,16 @@ public class FilmsController : Controller
         _filmService = filmService;
     }
 
-    // GET: FILMS
-    public async Task<IActionResult> Index()
+    // GET: api/Films
+    [HttpGet]
+    public async Task<ActionResult<List<Film>>> GetAll()
     {
-        return View(await _filmService.GetAllFilmsAsync());
+        return Ok(await _filmService.GetAllFilmsAsync());
     }
 
-    // GET: FILMS/Details/5
-    public async Task<IActionResult> Details(int? id)
+    // GET: api/Films/5
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<Film>> GetById(int id)
     {
         var film = await _filmService.GetFilmByIdAsync(id);
         if (film == null)
@@ -31,68 +34,38 @@ public class FilmsController : Controller
             return NotFound();
         }
 
-        return View(film);
+        return Ok(film);
     }
 
-    // GET: FILMS/Create
-    public IActionResult Create()
-    {
-        return View();
-    }
-
-    // POST: FILMS/Create
+    // POST: api/Films
+    // multipart/form-data: поля Film + необов'язковий файл PhotoFile
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Title,Director,ReleaseYear,Genre,Rating,PhotoUrl")] Film film, IFormFile PhotoFile)
+    public async Task<ActionResult<Film>> Create([FromForm] Film film, IFormFile? photoFile)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(film);
-        }
-
         try
         {
-            await _filmService.CreateFilmAsync(film, PhotoFile);
+            var created = await _filmService.CreateFilmAsync(film, photoFile);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError("PhotoFile", "Error uploading file: " + ex.Message);
-            return View(film);
+            ModelState.AddModelError("photoFile", "Error uploading file: " + ex.Message);
+            return ValidationProblem(ModelState);
         }
-
-        return RedirectToAction(nameof(Index));
     }
 
-    // GET: FILMS/Edit/5
-    public async Task<IActionResult> Edit(int? id)
-    {
-        var film = await _filmService.GetFilmByIdAsync(id);
-        if (film == null)
-        {
-            return NotFound();
-        }
-
-        return View(film);
-    }
-
-    // POST: FILMS/Edit/5
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("Id,Title,Director,ReleaseYear,Genre,Rating,PhotoUrl")] Film film, IFormFile PhotoFile)
+    // PUT: api/Films/5
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromForm] Film film, IFormFile? photoFile)
     {
         if (id != film.Id)
         {
-            return NotFound();
-        }
-
-        if (!ModelState.IsValid)
-        {
-            return View(film);
+            return BadRequest("Route id and film id do not match.");
         }
 
         try
         {
-            bool updated = await _filmService.UpdateFilmAsync(id.Value, film, PhotoFile);
+            bool updated = await _filmService.UpdateFilmAsync(id, film, photoFile);
             if (!updated)
             {
                 return NotFound();
@@ -100,15 +73,16 @@ public class FilmsController : Controller
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError("PhotoFile", "Error uploading file: " + ex.Message);
-            return View(film);
+            ModelState.AddModelError("photoFile", "Error uploading file: " + ex.Message);
+            return ValidationProblem(ModelState);
         }
 
-        return RedirectToAction(nameof(Index));
+        return NoContent();
     }
 
-    // GET: FILMS/Delete/5
-    public async Task<IActionResult> Delete(int? id)
+    // DELETE: api/Films/5
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
     {
         var film = await _filmService.GetFilmByIdAsync(id);
         if (film == null)
@@ -116,15 +90,7 @@ public class FilmsController : Controller
             return NotFound();
         }
 
-        return View(film);
-    }
-
-    // POST: FILMS/Delete/5
-    [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int? id)
-    {
         await _filmService.DeleteFilmAsync(id);
-        return RedirectToAction(nameof(Index));
+        return NoContent();
     }
 }

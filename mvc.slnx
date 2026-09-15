@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="mvc.csproj" />
+  <Project Path="mvc.DAL\mvc.DAL.csproj" />
+  <Project Path="mvc.BLL\mvc.BLL.csproj" />
+  <Project Path="mvc.PL\mvc.PL.csproj" />
 </Solution>

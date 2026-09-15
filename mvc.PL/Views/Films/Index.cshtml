@@ -1,0 +1,8 @@
+@model IReadOnlyList<FilmDto>
+@{ ViewData["Title"] = "Фільми"; }
+<h1>10 найкращих фільмів</h1>
+@if (TempData["SuccessMessage"] is string message) { <div class="alert alert-success">@message</div> }
+<p><a asp-action="Create" class="btn btn-primary">Додати фільм</a></p>
+<table class="table"><thead><tr><th>Постер</th><th>Назва</th><th>Режисер</th><th>Жанр</th><th>Рік</th><th>Рейтинг</th><th></th></tr></thead><tbody>
+@foreach (var film in Model) { <tr><td>@if (!string.IsNullOrWhiteSpace(film.PhotoUrl)) { <img src="@film.PhotoUrl" alt="@film.Title" width="60" /> }</td><td>@film.Title</td><td>@film.Director</td><td>@film.Genre</td><td>@film.ReleaseYear</td><td>@film.Rating</td><td><a asp-action="Details" asp-route-id="@film.Id">Деталі</a> | <a asp-action="Edit" asp-route-id="@film.Id">Змінити</a> | <a asp-action="Delete" asp-route-id="@film.Id">Видалити</a></td></tr> }
+</tbody></table>

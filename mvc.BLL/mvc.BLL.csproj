@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>mvc.BLL</RootNamespace>
+  </PropertyGroup>
+
+  <!-- FrameworkReference дає доступ до IFormFile / IWebHostEnvironment,
+       які використовує FilmService для роботи із завантаженням постерів -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\mvc.DAL\mvc.DAL.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,10 @@
+@model FilmFormViewModel
+<form method="post" enctype="multipart/form-data"><div asp-validation-summary="ModelOnly" class="text-danger"></div><input asp-for="Id" type="hidden" />
+<div class="mb-3"><label asp-for="Title"></label><input asp-for="Title" class="form-control"/><span asp-validation-for="Title" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Director"></label><input asp-for="Director" class="form-control"/><span asp-validation-for="Director" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Genre"></label><input asp-for="Genre" class="form-control"/><span asp-validation-for="Genre" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="ReleaseYear"></label><input asp-for="ReleaseYear" class="form-control"/><span asp-validation-for="ReleaseYear" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Rating"></label><input asp-for="Rating" class="form-control" step="0.1"/><span asp-validation-for="Rating" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="PhotoUrl">URL постера</label><input asp-for="PhotoUrl" class="form-control"/><span asp-validation-for="PhotoUrl" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Poster">Новий постер</label><input asp-for="Poster" class="form-control" accept="image/png,image/jpeg,image/webp"/><span asp-validation-for="Poster" class="text-danger"></span></div>
+<button class="btn btn-primary" type="submit">Зберегти</button> <a asp-action="Index">Скасувати</a></form>

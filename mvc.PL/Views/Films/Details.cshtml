@@ -1,0 +1,6 @@
+@model FilmDto
+@{ ViewData["Title"] = Model.Title; }
+@if (TempData["SuccessMessage"] is string message) { <div class="alert alert-success">@message</div> }
+<h1>@Model.Title</h1>@if (!string.IsNullOrWhiteSpace(Model.PhotoUrl)) { <img src="@Model.PhotoUrl" alt="@Model.Title" width="200" /> }
+<dl class="row"><dt class="col-sm-2">Режисер</dt><dd class="col-sm-10">@Model.Director</dd><dt class="col-sm-2">Жанр</dt><dd class="col-sm-10">@Model.Genre</dd><dt class="col-sm-2">Рік</dt><dd class="col-sm-10">@Model.ReleaseYear</dd><dt class="col-sm-2">Рейтинг</dt><dd class="col-sm-10">@Model.Rating</dd></dl>
+<a asp-action="Edit" asp-route-id="@Model.Id">Змінити</a> | <a asp-action="Index">До списку</a>

@@ -1,0 +1,3 @@
+@model FilmDto
+@{ ViewData["Title"] = "Видалити фільм"; }
+<h1>Видалити «@Model.Title»?</h1><p>Дія незворотна.</p><form asp-action="Delete" method="post"><input type="hidden" name="id" value="@Model.Id"/><button class="btn btn-danger" type="submit">Видалити</button> <a asp-action="Details" asp-route-id="@Model.Id">Скасувати</a></form>

@@ -9,7 +9,8 @@ import {
 
 import './App.css';
 
-const API_BASE_URL = '/api';
+// На Render задається змінна VITE_API_URL (повна адреса API); локально працює проксі Vite через '/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? '/api';
 
 const columnHelper = createColumnHelper();
 

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Domain - центр Clean Architecture. Жодних посилань на інші проєкти рішення
+       і жодних NuGet-пакетів: сутності - прості POCO-класи (Film), а контракти
+       доступу до даних (IRepository, IUnitOfWork) оголошені тут за принципом
+       інверсії залежностей - Infrastructure згодом реалізує ці інтерфейси. -->
+
+</Project>

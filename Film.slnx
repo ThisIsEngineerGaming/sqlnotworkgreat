@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Film.Domain\Film.Domain.csproj" />
+  <Project Path="Film.Common\Film.Common.csproj" />
+  <Project Path="Film.Application\Film.Application.csproj" />
+  <Project Path="Film.Infrastructure\Film.Infrastructure.csproj" />
+  <Project Path="Film.WebAPI\Film.WebAPI.csproj" />
+</Solution>

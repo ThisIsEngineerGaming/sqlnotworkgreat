@@ -1,38 +1,74 @@
-# ASP.NET Core MVC
+# Кінопошук — ASP.NET Core Web API + React
 
-**Автор:** sunmeat  
-**Мова проєкту:** C#  
-**Фреймворк:** ASP.NET Core MVC  
+**Автор:** sunmeat
+**Мова проєкту:** C# / JavaScript (React)
+**Фреймворк:** ASP.NET Core Web API (Clean Architecture) + Vite/React
 
 ## Опис проєкту
 
-«Кінопошук» — ASP.NET Core MVC застосунок із трирівневою архітектурою.
+«Кінопошук» — застосунок для каталогу фільмів, розділений на два незалежні застосунки:
+бекенд (ASP.NET Core Web API, Clean Architecture, 5 проєктів) та фронтенд (React + TanStack Table,
+Vite dev server). Це переробка попередньої версії на класичному ASP.NET Core MVC
+(яка збережена без змін у `_legacy_mvc/` для довідки).
 
 ```text
-HTTP request → mvc.PL (Controller + ViewModel)
-             → mvc.BLL (IFilmService, DTO, business rules)
-             → mvc.DAL (IUnitOfWork, IRepository, EF Core DbContext)
-             → PostgreSQL
+Browser (film.client, React + TanStack Table)
+        │  fetch('/api/films') — проксується Vite на бекенд у режимі розробки
+        ▼
+Film.WebAPI (Controllers, композиційний корінь)
+        │
+        ▼
+Film.Application (IEntityService<FilmDTO>, FilmService, AutoMapper-профіль, бізнес-правила)
+        │
+        ▼
+Film.Domain (сутність Film, IRepository, IUnitOfWork — жодних залежностей)
+        ▲
+        │  реалізує контракти Domain
+Film.Infrastructure (EF Core, FilmContext, FilmRepository, EFUnitOfWork, PostgreSQL)
+
+Film.Common — наскрізні речі (ValidationException, BusinessRuleException),
+              видимі і Application, і Presentation.
 ```
 
-`mvc.PL` містить лише HTTP/MVC-відповідальність і локальне сховище файлів. `mvc.BLL` не повертає EF-сутності: він передає DTO, перевіряє правила предметної області та працює з DAL через `IUnitOfWork`. `mvc.DAL` відповідає тільки за зберігання даних.
+Напрямок залежностей суворо всередину — до Domain, за принципами Clean Architecture /
+Dependency Inversion Principle: Domain нічого не знає про EF Core чи ASP.NET Core,
+а Infrastructure та Application лише реалізують чи споживають його контракти.
 
-Контролер підтримує повний CRUD, серверну й клієнтську валідацію, одноразові повідомлення та безпечне завантаження постерів (JPEG/PNG/WebP, до 5 МБ, унікальне ім’я). Старий локальний постер видаляється лише після успішного оновлення запису.
+## Структура репозиторію
+
+| Проєкт               | Призначення                                                         |
+|-----------------------|----------------------------------------------------------------------|
+| `Film.Domain`         | Сутність `Film`, `IRepository<T>`, `IUnitOfWork` — центр архітектури |
+| `Film.Common`          | `ValidationException`, `BusinessRuleException`                      |
+| `Film.Application`    | `FilmDTO`, `IEntityService<TDto>`, `FilmService`, AutoMapper-профіль |
+| `Film.Infrastructure` | `FilmContext` (EF Core + PostgreSQL), репозиторій, Unit of Work      |
+| `Film.WebAPI`         | `FilmsController` (`api/films`), композиційний корінь, `Program.cs`  |
+| `film.client`         | React SPA (Vite), TanStack Table з сортуванням, форма CRUD           |
+| `_legacy_mvc`         | Оригінальна версія на класичному ASP.NET Core MVC (`mvc.DAL/BLL/PL`) |
 
 ## Основні можливості
-- Класична MVC-архітектура
-- Razor-шаблони (.cshtml)
-- Вбудована система Dependency Injection
-- Підтримка Tag Helpers
-- Статичні файли у папці `wwwroot`
-- Конфігурація через `appsettings.json`
-- Middleware-пайплайн ASP.NET Core
-- DTO та ViewModel для ізоляції шарів
-- Unit of Work і generic repository
+
+- Чиста архітектура (Domain / Application / Infrastructure / Presentation)
+- REST API: `GET/POST/PUT/DELETE api/films`
+- React SPA з таблицею на `@tanstack/react-table` (клікабельне сортування колонок)
+- CRUD-форма з валідацією на клієнті та сервері (DataAnnotations)
+- Бізнес-правила в шарі Application (унікальність назви фільму, коректний рік/рейтинг)
+- AutoMapper для проєкції сутність → DTO
+- PostgreSQL через Npgsql + EF Core, посів початкових даних через `HasData`
+- SpaProxy для безшовної розробки: бекенд автоматично піднімає `npm run dev`
+
+## Запуск у розробці
+
+1. Відкрити `Film.slnx` у Visual Studio (або `dotnet run --project Film.WebAPI`).
+2. Переконайтесь, що PostgreSQL піднятий і рядок підключення в
+   `Film.WebAPI/appsettings.json` відповідає вашому середовищу.
+3. Запустити `Film.WebAPI` — SpaProxy автоматично виконає `npm install`/`npm run dev`
+   у `film.client` і відкриє React-застосунок на `https://localhost:3001`
+   (проксує `/api/*` на `https://localhost:5050`).
 
 ## Технології
 
-- .NET 10
-- C# 14
-- Razor Views
-- Entity Framework Core
+- .NET 10, C# 14
+- ASP.NET Core Web API, AutoMapper
+- Entity Framework Core + Npgsql (PostgreSQL)
+- React 19, Vite, `@tanstack/react-table`

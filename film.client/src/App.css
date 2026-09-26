@@ -95,6 +95,38 @@ body {
     margin-top: 2px;
 }
 
+.lang-switcher {
+    display: flex;
+    gap: 6px;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+}
+
+.lang-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+    .lang-btn:hover {
+        color: #fff;
+        background: var(--surface-hover);
+    }
+
+    .lang-btn.active {
+        background: linear-gradient(135deg, var(--primary) 0%, #ffb200 100%);
+        color: #1a1330;
+    }
+
 .main {
     flex: 1;
     max-width: 1320px;

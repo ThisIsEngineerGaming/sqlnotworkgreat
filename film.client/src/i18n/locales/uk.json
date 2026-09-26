@@ -1,0 +1,59 @@
+{
+  "app": {
+    "title": "Кіно каталог",
+    "subtitle": "Менеджер фільмів"
+  },
+  "form": {
+    "addTitle": "Додати фільм",
+    "editTitle": "Редагувати фільм",
+    "titleLabel": "Назва фільму",
+    "titlePlaceholder": "наприклад, Темний лицар",
+    "directorLabel": "Режисер",
+    "directorPlaceholder": "наприклад, Крістофер Нолан",
+    "yearLabel": "Рік випуску",
+    "genreLabel": "Жанр",
+    "genrePlaceholder": "наприклад, Екшн",
+    "ratingLabel": "Рейтинг (0-10)",
+    "ratingPlaceholder": "8.5",
+    "posterLabel": "Посилання на постер",
+    "posterPlaceholder": "https://...",
+    "save": "Зберегти",
+    "create": "Створити",
+    "cancel": "Скасувати"
+  },
+  "table": {
+    "listTitle": "Список фільмів",
+    "records": "записів",
+    "colId": "ID",
+    "colPoster": "Постер",
+    "colTitle": "Назва",
+    "colDirector": "Режисер",
+    "colYear": "Рік",
+    "colGenre": "Жанр",
+    "colRating": "Рейтинг",
+    "colActions": "Дії",
+    "noData": "Дані відсутні",
+    "loading": "Завантаження...",
+    "edit": "Редагувати",
+    "delete": "Видалити"
+  },
+  "modal": {
+    "title": "Видалити запис?",
+    "text": "Фільм «{{film}}» буде видалено назавжди. Цю дію неможливо скасувати.",
+    "cancel": "Скасувати",
+    "confirm": "Видалити"
+  },
+  "footer": {
+    "description": "Приклад на Clean Architecture: ASP.NET Core Web API + React (розділено з mono-MVC)"
+  },
+  "errors": {
+    "load": "Помилка завантаження: {{status}}",
+    "delete": "Помилка при видаленні",
+    "save": "Не вдалося зберегти фільм"
+  },
+  "lang": {
+    "uk": "Українська",
+    "en": "Англійська",
+    "pl": "Польська"
+  }
+}

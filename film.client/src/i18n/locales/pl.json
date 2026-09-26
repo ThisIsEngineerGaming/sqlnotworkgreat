@@ -1,0 +1,59 @@
+{
+  "app": {
+    "title": "Katalog filmów",
+    "subtitle": "Menedżer filmów"
+  },
+  "form": {
+    "addTitle": "Dodaj film",
+    "editTitle": "Edytuj film",
+    "titleLabel": "Tytuł filmu",
+    "titlePlaceholder": "np. Mroczny Rycerz",
+    "directorLabel": "Reżyser",
+    "directorPlaceholder": "np. Christopher Nolan",
+    "yearLabel": "Rok wydania",
+    "genreLabel": "Gatunek",
+    "genrePlaceholder": "np. Akcja",
+    "ratingLabel": "Ocena (0-10)",
+    "ratingPlaceholder": "8.5",
+    "posterLabel": "Link do plakatu",
+    "posterPlaceholder": "https://...",
+    "save": "Zapisz",
+    "create": "Utwórz",
+    "cancel": "Anuluj"
+  },
+  "table": {
+    "listTitle": "Lista filmów",
+    "records": "pozycji",
+    "colId": "ID",
+    "colPoster": "Plakat",
+    "colTitle": "Tytuł",
+    "colDirector": "Reżyser",
+    "colYear": "Rok",
+    "colGenre": "Gatunek",
+    "colRating": "Ocena",
+    "colActions": "Akcje",
+    "noData": "Brak danych",
+    "loading": "Ładowanie...",
+    "edit": "Edytuj",
+    "delete": "Usuń"
+  },
+  "modal": {
+    "title": "Usunąć pozycję?",
+    "text": "Film „{{film}}” zostanie usunięty na stałe. Tej operacji nie można cofnąć.",
+    "cancel": "Anuluj",
+    "confirm": "Usuń"
+  },
+  "footer": {
+    "description": "Przykład Clean Architecture: ASP.NET Core Web API + React (oddzielone od mono-MVC)"
+  },
+  "errors": {
+    "load": "Błąd wczytywania: {{status}}",
+    "delete": "Błąd podczas usuwania",
+    "save": "Nie udało się zapisać filmu"
+  },
+  "lang": {
+    "uk": "Ukraiński",
+    "en": "Angielski",
+    "pl": "Polski"
+  }
+}

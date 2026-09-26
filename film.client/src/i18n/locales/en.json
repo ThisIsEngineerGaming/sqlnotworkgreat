@@ -1,0 +1,59 @@
+{
+  "app": {
+    "title": "Movie Catalog",
+    "subtitle": "Film Manager"
+  },
+  "form": {
+    "addTitle": "Add movie",
+    "editTitle": "Edit movie",
+    "titleLabel": "Movie title",
+    "titlePlaceholder": "e.g. The Dark Knight",
+    "directorLabel": "Director",
+    "directorPlaceholder": "e.g. Christopher Nolan",
+    "yearLabel": "Release year",
+    "genreLabel": "Genre",
+    "genrePlaceholder": "e.g. Action",
+    "ratingLabel": "Rating (0-10)",
+    "ratingPlaceholder": "8.5",
+    "posterLabel": "Poster URL",
+    "posterPlaceholder": "https://...",
+    "save": "Save",
+    "create": "Create",
+    "cancel": "Cancel"
+  },
+  "table": {
+    "listTitle": "Movie list",
+    "records": "records",
+    "colId": "ID",
+    "colPoster": "Poster",
+    "colTitle": "Title",
+    "colDirector": "Director",
+    "colYear": "Year",
+    "colGenre": "Genre",
+    "colRating": "Rating",
+    "colActions": "Actions",
+    "noData": "No data",
+    "loading": "Loading...",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "modal": {
+    "title": "Delete record?",
+    "text": "The movie \"{{film}}\" will be permanently deleted. This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+  "footer": {
+    "description": "Clean Architecture example: ASP.NET Core Web API + React (split from mono-MVC)"
+  },
+  "errors": {
+    "load": "Loading error: {{status}}",
+    "delete": "Error while deleting",
+    "save": "Failed to save the movie"
+  },
+  "lang": {
+    "uk": "Ukrainian",
+    "en": "English",
+    "pl": "Polish"
+  }
+}

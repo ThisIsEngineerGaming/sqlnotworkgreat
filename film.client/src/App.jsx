@@ -8,6 +8,8 @@ import {
 } from '@tanstack/react-table';
 
 import './App.css';
+import { useI18n } from './i18n/I18nContext';
+import LanguageSwitcher from './i18n/LanguageSwitcher';
 
 // На Render задається змінна VITE_API_URL (повна адреса API); локально працює проксі Vite через '/api'
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? '/api';
@@ -40,6 +42,7 @@ function RatingBadge({ value }) {
 }
 
 export default function App() {
+    const { t, localeTag } = useI18n();
     const [films, setFilms] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -50,15 +53,15 @@ export default function App() {
 
     const columns = useMemo(
         () => [
-            columnHelper.accessor('id', { header: 'ID' }),
-            columnHelper.accessor('photoUrl', { header: 'Постер', enableSorting: false }),
-            columnHelper.accessor('title', { header: 'Назва' }),
-            columnHelper.accessor('director', { header: 'Режисер' }),
-            columnHelper.accessor('releaseYear', { header: 'Рік' }),
-            columnHelper.accessor('genre', { header: 'Жанр' }),
-            columnHelper.accessor('rating', { header: 'Рейтинг' }),
+            columnHelper.accessor('id', { header: t('table.colId') }),
+            columnHelper.accessor('photoUrl', { header: t('table.colPoster'), enableSorting: false }),
+            columnHelper.accessor('title', { header: t('table.colTitle') }),
+            columnHelper.accessor('director', { header: t('table.colDirector') }),
+            columnHelper.accessor('releaseYear', { header: t('table.colYear') }),
+            columnHelper.accessor('genre', { header: t('table.colGenre') }),
+            columnHelper.accessor('rating', { header: t('table.colRating') }),
         ],
-        []
+        [t]
     );
 
     const table = useTable({
@@ -81,7 +84,7 @@ export default function App() {
         setError(null);
         try {
             const response = await fetch(`${API_BASE_URL}/films`);
-            if (!response.ok) throw new Error(`Помилка завантаження: ${response.statusText}`);
+            if (!response.ok) throw new Error(t('errors.load', { status: response.statusText }));
             const data = await response.json();
             setFilms(data);
         } catch (err) {
@@ -89,7 +92,7 @@ export default function App() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         fetchFilms();
@@ -117,7 +120,7 @@ export default function App() {
             });
             if (!response.ok) {
                 const message = await response.text();
-                throw new Error(message || 'Не вдалося зберегти фільм');
+                throw new Error(message || t('errors.save'));
             }
             resetForm();
             fetchFilms();
@@ -148,7 +151,7 @@ export default function App() {
         setConfirmDialog(null);
         try {
             const response = await fetch(`${API_BASE_URL}/films/${id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Помилка при видаленні');
+            if (!response.ok) throw new Error(t('errors.delete'));
             fetchFilms();
         } catch (err) {
             setError(err.message);
@@ -162,10 +165,11 @@ export default function App() {
                     <div className="brand">
                         <span className="brand-icon">🎬</span>
                         <div className="brand-text">
-                            <span className="brand-title">Кіно каталог</span>
-                            <span className="brand-sub">Менеджер фільмів</span>
+                            <span className="brand-title">{t('app.title')}</span>
+                            <span className="brand-sub">{t('app.subtitle')}</span>
                         </div>
                     </div>
+                    <LanguageSwitcher />
                 </div>
             </header>
 
@@ -175,31 +179,31 @@ export default function App() {
                 <div className="layout">
                     <section className="panel form-panel">
                         <div className="panel-head">
-                            <h2>{isEditing ? 'Редагувати' : 'Додати'} фільм</h2>
+                            <h2>{isEditing ? t('form.editTitle') : t('form.addTitle')}</h2>
                         </div>
                         <form onSubmit={handleSubmit} className="form">
                             <div className="field">
-                                <label>Назва фільму</label>
+                                <label>{t('form.titleLabel')}</label>
                                 <input
                                     type="text"
                                     required
                                     value={form.title}
                                     onChange={(e) => setForm({ ...form, title: e.target.value })}
-                                    placeholder="наприклад, Темний лицар"
+                                    placeholder={t('form.titlePlaceholder')}
                                 />
                             </div>
                             <div className="field">
-                                <label>Режисер</label>
+                                <label>{t('form.directorLabel')}</label>
                                 <input
                                     type="text"
                                     required
                                     value={form.director}
                                     onChange={(e) => setForm({ ...form, director: e.target.value })}
-                                    placeholder="наприклад, Крістофер Нолан"
+                                    placeholder={t('form.directorPlaceholder')}
                                 />
                             </div>
                             <div className="field">
-                                <label>Рік випуску</label>
+                                <label>{t('form.yearLabel')}</label>
                                 <input
                                     type="number"
                                     required
@@ -210,17 +214,17 @@ export default function App() {
                                 />
                             </div>
                             <div className="field">
-                                <label>Жанр</label>
+                                <label>{t('form.genreLabel')}</label>
                                 <input
                                     type="text"
                                     required
                                     value={form.genre}
                                     onChange={(e) => setForm({ ...form, genre: e.target.value })}
-                                    placeholder="наприклад, Екшн"
+                                    placeholder={t('form.genrePlaceholder')}
                                 />
                             </div>
                             <div className="field">
-                                <label>Рейтинг (0-10)</label>
+                                <label>{t('form.ratingLabel')}</label>
                                 <input
                                     type="number"
                                     required
@@ -229,26 +233,26 @@ export default function App() {
                                     max="10"
                                     value={form.rating}
                                     onChange={(e) => setForm({ ...form, rating: e.target.value })}
-                                    placeholder="8.5"
+                                    placeholder={t('form.ratingPlaceholder')}
                                 />
                             </div>
                             <div className="field">
-                                <label>Посилання на постер</label>
+                                <label>{t('form.posterLabel')}</label>
                                 <input
                                     type="url"
                                     value={form.photoUrl}
                                     onChange={(e) => setForm({ ...form, photoUrl: e.target.value })}
-                                    placeholder="https://..."
+                                    placeholder={t('form.posterPlaceholder')}
                                 />
                             </div>
 
                             <div className="form-actions">
                                 <button type="submit" className="btn btn-primary">
-                                    {isEditing ? 'Зберегти' : 'Створити'}
+                                    {isEditing ? t('form.save') : t('form.create')}
                                 </button>
                                 {isEditing && (
                                     <button type="button" className="btn btn-ghost" onClick={resetForm}>
-                                        Скасувати
+                                        {t('form.cancel')}
                                     </button>
                                 )}
                             </div>
@@ -257,34 +261,34 @@ export default function App() {
 
                     <section className="panel list-panel">
                         <div className="panel-head">
-                            <h2>Список фільмів</h2>
-                            <span className="count">{sortedFilms.length} записів</span>
+                            <h2>{t('table.listTitle')}</h2>
+                            <span className="count">{sortedFilms.length} {t('table.records')}</span>
                         </div>
 
                         {loading ? (
                             <div className="loader">
                                 <div className="spinner"></div>
-                                <span>Завантаження...</span>
+                                <span>{t('table.loading')}</span>
                             </div>
                         ) : (
                             <div className="table-wrap">
                                 <table>
                                     <thead>
                                         <tr>
-                                            <SortableTh table={table} column="id">ID</SortableTh>
-                                            <th>Постер</th>
-                                            <SortableTh table={table} column="title">Назва</SortableTh>
-                                            <SortableTh table={table} column="director">Режисер</SortableTh>
-                                            <SortableTh table={table} column="releaseYear">Рік</SortableTh>
-                                            <SortableTh table={table} column="genre">Жанр</SortableTh>
-                                            <SortableTh table={table} column="rating">Рейтинг</SortableTh>
-                                            <th>Дії</th>
+                                            <SortableTh table={table} column="id">{t('table.colId')}</SortableTh>
+                                            <th>{t('table.colPoster')}</th>
+                                            <SortableTh table={table} column="title">{t('table.colTitle')}</SortableTh>
+                                            <SortableTh table={table} column="director">{t('table.colDirector')}</SortableTh>
+                                            <SortableTh table={table} column="releaseYear">{t('table.colYear')}</SortableTh>
+                                            <SortableTh table={table} column="genre">{t('table.colGenre')}</SortableTh>
+                                            <SortableTh table={table} column="rating">{t('table.colRating')}</SortableTh>
+                                            <th>{t('table.colActions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {sortedFilms.length === 0 ? (
                                             <tr>
-                                                <td colSpan={8} className="empty">Дані відсутні</td>
+                                                <td colSpan={8} className="empty">{t('table.noData')}</td>
                                             </tr>
                                         ) : (
                                             sortedFilms.map((film) => (
@@ -305,10 +309,10 @@ export default function App() {
                                                     </td>
                                                     <td><RatingBadge value={film.rating} /></td>
                                                     <td className="actions">
-                                                        <button className="icon-btn edit" onClick={() => handleEdit(film)} title="Редагувати">
+                                                        <button className="icon-btn edit" onClick={() => handleEdit(film)} title={t('table.edit')}>
                                                             ✎
                                                         </button>
-                                                        <button className="icon-btn delete" onClick={() => requestDelete(film.id, film.title)} title="Видалити">
+                                                        <button className="icon-btn delete" onClick={() => requestDelete(film.id, film.title)} title={t('table.delete')}>
                                                             ✕
                                                         </button>
                                                     </td>
@@ -327,10 +331,10 @@ export default function App() {
                 <div className="footer-inner">
                     <div className="footer-brand">
                         <span className="brand-icon">🎬</span>
-                        <span>Кіно каталог</span>
+                        <span>{t('app.title')}</span>
                     </div>
-                    <p>Приклад на Clean Architecture: ASP.NET Core Web API + React (розділено з мono-MVC)</p>
-                    <p className="footer-copy">© {new Date().toLocaleString('uk-UA')}</p>
+                    <p>{t('footer.description')}</p>
+                    <p className="footer-copy">© {new Date().toLocaleString(localeTag)}</p>
                 </div>
             </footer>
 
@@ -338,16 +342,16 @@ export default function App() {
                 <div className="modal-overlay" onClick={cancelDelete}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-icon">⚠</div>
-                        <h3 className="modal-title">Видалити запис?</h3>
+                        <h3 className="modal-title">{t('modal.title')}</h3>
                         <p className="modal-text">
-                            Фільм «{confirmDialog.title}» буде видалено назавжди. Цю дію неможливо скасувати.
+                            {t('modal.text', { film: confirmDialog.title })}
                         </p>
                         <div className="modal-actions">
                             <button className="btn btn-ghost" onClick={cancelDelete}>
-                                Скасувати
+                                {t('modal.cancel')}
                             </button>
                             <button className="btn btn-danger" onClick={confirmDelete}>
-                                Видалити
+                                {t('modal.confirm')}
                             </button>
                         </div>
                     </div>
